@@ -19,7 +19,9 @@ const PACKET_DEFINITIONS = {
             AC_ACCEPT_LOGIN3: 0x0ac4,        // Modern accept login (224 bytes)
             AC_REFUSE_LOGIN: 0x006a,
             HC_ACCEPT_ENTER_NEO_UNION_HEADER: 0x082d,  // Char list header
+            PACKET_HC_ACCEPT_ENTER2: 0x082d,  // Char list header
             HC_ACCEPT_ENTER_NEO_UNION: 0x006b,        // Char list data
+            PACKET_HC_ACCEPT_ENTER: 0x006b,        // Char list data
             HC_CHARLIST_NOTIFY: 0x09a0,      // Char list notification
             HC_BLOCK_CHARACTER: 0x020d,      // Block character list
             HC_SECOND_PASSWD_LOGIN: 0x08b9,  // PIN request/success

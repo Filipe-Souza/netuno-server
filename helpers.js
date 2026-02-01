@@ -1,5 +1,30 @@
 const crypto = require('crypto');
 class Helpers {
+
+    _hex(buffer, max = 96) {
+        const b = Buffer.from(buffer);
+        const s = b.slice(0, max).toString('hex').match(/../g)?.join(' ') ?? '';
+        return b.length > max ? `${s} ... (+${b.length - max} bytes)` : s;
+    }
+
+    log(level, message){
+        const colors = {
+            INFO: '\x1b[34m',    // Blue
+            ERROR: '\x1b[31m',   // Red
+            WARNING: '\x1b[33m'  // Yellow
+        }
+        const reset = '\x1b[0m';
+        const color = colors[level] || '';
+        console.log(`${color}[${level}]${reset} ${message}`);
+    }
+
+    logPacket(packetId, data) {
+        const pidStr = packetId.toString(16).padStart(4, '0');
+        // Make sure hex function is available
+        const hexStr = this._hex(data, 32);
+        this.log('INFO', `Packet 0x${pidStr} - length=${data.length} - hex=${hexStr}`);
+    }
+
     serverTypePort(port) {
         const portToType = {
             6900: 'login',
@@ -118,6 +143,10 @@ class Helpers {
                 gender: 1,
             }
         ];
+    }
+
+    generateAID() {
+        return 2000000 + (this.randU32() % 1000000);
     }
 }
 

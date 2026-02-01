@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const { Helpers } = require('./helpers');
 
 class CharServer {
@@ -138,7 +137,7 @@ class CharServer {
 
             // Packet header
             buf.writeUInt16LE(pkt, offset); offset += 2;
-            buf.writeUInt16LE(packetLen, offset); offset += 2;
+            buf.writeUInt16LE(pktLen, offset); offset += 2;
 
             // Header fields (for packetver <= 20100413 - no slot fields)
             buf.writeInt8(0, offset); offset += 1;    // dummy1_beginbilling
@@ -297,7 +296,7 @@ class CharServer {
 
             // Packet header
             buf.writeUInt16LE(pkt, offset); offset += 2;
-            buf.writeUInt16LE(packetLen, offset); offset += 2;
+            buf.writeUInt16LE(pktLen, offset); offset += 2;
 
             // Header fields (for packetver >= 20100413)
             buf.writeUInt8(15, offset); offset += 1;  // TotalSlotNum
@@ -556,13 +555,11 @@ class CharServer {
         const charList = this.sendCompleteCharList()
     }
 
-    sendCompleteCharList(conn) {
-
-        _sendCharListHeader();
-        _sendCharListData();
-        _sendCharListNotify();
-        _sendBlockCharacter();
-
+    sendCompleteCharList() {
+        this._sendCharListHeader();
+        this._sendCharListData();
+        this._sendCharListNotify();
+        this._sendBlockCharacter();
     }
 
 }

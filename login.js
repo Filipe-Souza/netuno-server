@@ -27,22 +27,22 @@ class LoginServer {
     login(connId, packetId, data) {
         switch (packetId) {
             case this.packets.getClientPacket('CA_LOGIN'):
-            case this.packets.getClientPacket('CA_LOGIN2'):
+            case this.packets.getClientPacket('CA_LOGIN2'): {
                 const loginInfo = this.processLoginInfo(packetId, data);
-                const packetData = this.buildLoginPacket(this.packetVer, loginInfo);
+                const packetData = this.buildLoginPacket(connId, this.packetVer, loginInfo);
                 return { loginInfo, packetData };
-
-            case this.packets.getClientPacket('CA_CONNECT_INFO_CHANGED'):
+            }
+            case this.packets.getClientPacket('CA_CONNECT_INFO_CHANGED'): {
                 this.helpers.logPacket(this.packets.getClientPacket('CA_CONNECT_INFO_CHANGED'), 0);
                 this.helpers.log('Client info changed, ignoring.');
                 return;
-
+            }
             default:
                 this.helpers.log('ERROR', `[${connId}] Unknown login packet: 0x${packetId.toString(16)}`)
         }
     }
 
-    buildLoginPacket(packetVer, loginInfo) {
+    buildLoginPacket(connId, packetVer, loginInfo) {
         let buf;
         if (packetVer < 20170315) {
             // TODO
@@ -102,7 +102,7 @@ class LoginServer {
         const aid = this.helpers.generateAID();
         const {username, password} = this._processAuthentication(packetId, data);
 
-        this.helpers.log('INFO', `[${connId}] Generating login info`);
+        this.helpers.log('INFO', `[${connId}] Generating login info, client version ${version}`);
 
         return {
             aid: aid,
@@ -110,6 +110,7 @@ class LoginServer {
             login_id2: this.helpers.randU32(),
             sex: Math.random() > 0.5 ? 0 : 1,
             accountName: username,
+            password: password,
             clientType: clientType,
             lastLogin: Date.now(),
         };

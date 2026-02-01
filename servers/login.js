@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { Helpers } = require('./helpers');
+const { Helpers } = require('../helpers');
 
 class LoginServer {
     packets = {}
@@ -73,7 +73,7 @@ class LoginServer {
             // Port (6121 = 0x17E9)
             buf.writeUInt16LE(6121, offset); offset += 2;
 
-            // Server name (20 bytes) - "rAthena"
+            // Server name (max 20 bytes) - "Netuno Server"
             buf.fill(0, offset, offset + 20);
             buf.write('Netuno Server', offset, 'ascii');
             offset += 20;

@@ -1,4 +1,4 @@
-const { Helpers } = require('./helpers');
+const { Helpers } = require('../helpers');
 
 class CharServer {
     packets = {}
@@ -547,19 +547,40 @@ class CharServer {
 
         console.log(`[${conn.id}] Authentication successful!`);
 
-        // Send complete character list
-        setTimeout(() => {
-            this.sendCompleteCharacterList(conn);
-        }, 100);
+        const {charHeader, charListData, charListNotify, charBlock} = this.sendCompleteCharList()
 
-        const charList = this.sendCompleteCharList()
+    }
+
+    sendPinRequest(connId, aid, seed, state){
+        const buf = Buffer.alloc(12);
+        const pkt = this.packets.getServerPacket('HC_SECOND_PASSWD_LOGIN');
+        buf.writeUInt16LE(pkt, 0);
+        const signedSeed = seed > 2147483647 ? seed - 4294967296 : seed;
+        const signedAid = (aid || 0) > 2147483647 ? (aid || 0) - 4294967296 : (aid || 0);
+        buf.writeInt32LE(signedSeed, 2);  // Seed (signed 32-bit)
+        buf.writeInt32LE(signedAid, 6);  // Aid (signed 32-bit)
+        buf.writeInt16LE(state, 10);  // State (signed 16-bit): 1=request, 0=success
+        this.helpers.log('INFO', `[${connId}] Sending PIN request with seed ${seed}, AID=${aid}, state=${stage}`);
+        this.helpers.logPacket(pkt, buf);        
+        return buf;
+    }
+
+    handleCreatePin(connId, sessions, data) {
+        const aid = data.readUInt32LE(2);
+        const pin = this.helpers.zstr(data, 6, 4);
+        this.helpers.log('INFO', `[${connId}] New PIN created for AID=${aid}`);
+        const session = sessions.get(aid);
+        if (session) {
+            session.hasPin = true;
+        }        
     }
 
     sendCompleteCharList() {
-        this._sendCharListHeader();
-        this._sendCharListData();
-        this._sendCharListNotify();
-        this._sendBlockCharacter();
+        const charHeader = this._sendCharListHeader();
+        const charListData = this._sendCharListData();
+        const charListNotify = this._sendCharListNotify();
+        const charBlock = this._sendBlockCharacter();
+        return {charHeader, charListData, charListNotify, charBlock};
     }
 
 }

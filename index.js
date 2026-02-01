@@ -1,9 +1,8 @@
 const WebSocket = require('ws');
 const { PacketFactory, Packet } = require('./packets');
-const crypto = require('crypto');
 const { Helpers } = require('./helpers');
-const {LoginServer} = require("./login");
-const {CharServer} = require("./char");
+const {LoginServer} = require("./servers/login");
+const {CharServer} = require("./servers/char");
 
 class NetunoServer {
     packets = {};
@@ -49,11 +48,14 @@ class NetunoServer {
         }
 
         switch (conn.serverType) {
-            case 'login':
+            case 'login': {
                 const {sessionData, packetData} = this.LoginServer.login(conn.id, packetId, data);
                 this.sessions.set(sessionData.aid, sessionData);
                 conn.ws.send(packetData);
-            case 'char':
+            }
+            case 'char': {
+                const xpto = this.CharServer.char(conn.id, this.sessions, packetId, data);
+            }
             default:
                 if (packetId === this.packets.getClientPacket('CA_LOGIN')  || packetId === this.packets.getClientPacket('CA_LOGIN2')) {
                     const {sessionData, packetData} = this.LoginServer.login(conn.id, packetId, data);

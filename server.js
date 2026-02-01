@@ -322,7 +322,8 @@ class NetunoServer {
 
     handleChar(conn, pid, data) {
         switch (pid) {
-            case this.packets.getClientPacket('CH_ENTER'):
+            case this.packets.
+            ('CH_ENTER'):
                 return this.handleCharEnter(conn, data);
 
             case this.packets.getClientPacket('CH_CHARLIST_REQ'):
